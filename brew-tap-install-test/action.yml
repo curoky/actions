@@ -9,6 +9,10 @@ inputs:
     description: formula
     required: true
     default: ''
+  install_args:
+    description: 'args which brew-install need'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -29,7 +33,7 @@ runs:
 
     - name: install formula
       shell: bash
-      run: brew install --verbose curoky/custom/${{ inputs.formula }}
+      run: brew install ${{ inputs.install_args }} curoky/custom/${{ inputs.formula }}
 
     - name: test formula
       shell: bash
