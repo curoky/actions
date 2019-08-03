@@ -33,7 +33,7 @@ runs:
 
     - name: install formula
       shell: bash
-      run: brew install ${{ inputs.install_args }} curoky/custom/${{ inputs.formula }}
+      run: brew install --include-test ${{ inputs.install_args }} curoky/custom/${{ inputs.formula }}
 
     - name: test formula
       shell: bash
