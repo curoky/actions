@@ -1,0 +1,36 @@
+name: 'Debugging with tmate'
+description: 'Debug your GitHub Actions Environment interactively by using SSH or a Web shell'
+author: 'curoky'
+branding:
+  icon: 'box'
+  color: 'gray-dark'
+inputs:
+  version:
+    description: tmate version
+    required: false
+    default: '2.4.0'
+
+runs:
+  using: 'composite'
+  steps:
+    # TODO: use precompiled xz-utils
+    - name: Donwload xz
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xz-utils
+
+    - name: Donwload tmate
+      shell: bash
+      run: |
+        curl -Lo tmate.tar.xz https://github.com/tmate-io/tmate/releases/download/${{ inputs.version }}/tmate-${{ inputs.version }}-static-linux-amd64.tar.xz
+        tar -xJvf tmate.tar.xz --strip-components 1
+
+    - name: Run tmate
+      shell: bash
+      run: |
+        ./tmate -S /tmp/tmate.sock new-session -d
+        ./tmate -S /tmp/tmate.sock wait tmate-ready
+        ./tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+        ./tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+        while true; do ./tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'; sleep 10; done
