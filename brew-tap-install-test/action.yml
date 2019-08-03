@@ -29,12 +29,12 @@ runs:
 
     - name: install formula
       shell: bash
-      run: brew install --verbose ${{ inputs.formula }}
+      run: brew install --verbose curoky/custom/${{ inputs.formula }}
 
     - name: test formula
       shell: bash
-      run: brew test ${{ inputs.formula }} || brew reinstall ${{ inputs.formula }}
+      run: brew test curoky/custom/${{ inputs.formula }} || brew reinstall curoky/custom/${{ inputs.formula }}
 
     - name: test formula twice
       shell: bash
-      run: brew test ${{ inputs.formula }}
+      run: brew test curoky/custom/${{ inputs.formula }}
