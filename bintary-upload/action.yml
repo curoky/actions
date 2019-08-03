@@ -1,0 +1,54 @@
+# Ref: https://github.com/bpicode/github-action-upload-bintray
+name: 'action-upload-bintray'
+description: 'Upload files to JFrog Bintray'
+branding:
+  icon: 'upload'
+  color: 'green'
+inputs:
+  remote_filepath:
+    description: 'Path to the file that in remote'
+    required: true
+  local_filepath:
+    description: 'Path to the file that should be uploaded'
+    required: true
+  api_user:
+    description: 'Username for API usage'
+    required: true
+  api_key:
+    description: 'Key for API usage, it can be obtained from the user profile page'
+    required: true
+  repository_user:
+    description: 'Repository owner username'
+    required: true
+  repository:
+    description: 'Name of the repository'
+    required: true
+  package:
+    description: 'Name of the package'
+    required: true
+  version:
+    description: 'Version of the package'
+    required: true
+  publish:
+    description: 'Whether to publish the package right away, use "1" to enable'
+    required: false
+    default: '0'
+  override:
+    description: 'Override remote package'
+    required: false
+    default: '0'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Upload file
+      shell: bash
+      run: >
+        curl --show-error --location --request PUT
+        --upload-file "${{ inputs.local_filepath }}"
+        --user "${{ inputs.api_user }}:${{ inputs.api_key }}"
+        -H "X-Bintray-Package:${{ inputs.package }}"
+        -H "X-Bintray-Version:${{ inputs.version }}"
+        -H "X-Bintray-Override:${{ inputs.override }}"
+        -H "X-Bintray-Publish:${{ inputs.publish }}"
+        "https://api.bintray.com/content/${{ inputs.repository_user }}/${{ inputs.repository }}/${{ inputs.remote_filepath }}"
