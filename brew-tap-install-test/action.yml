@@ -8,15 +8,34 @@ inputs:
   formula:
     description: formula
     required: true
-    default: ''
   install_args:
-    description: 'args which brew-install need'
+    description: 'args for brew install'
     required: false
     default: ''
+  run_test:
+    description: 'run test after install'
+    required: false
+    default: 'true'
+  test_args:
+    description: 'args for brew test'
+    required: false
+    default: ''
+  upgrade:
+    description: 'update and upgrade homebrew'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
   steps:
+    - name: update and upgrade hoembrew
+      shell: bash
+      run: |
+        if [[ "${{ inputs.upgrade }}" == "true" ]]; then
+          brew update
+          brew upgrade
+        fi
+
     - name: install deps
       shell: bash
       run: brew install jq
@@ -27,18 +46,14 @@ runs:
         mkdir -p $(brew --repo)/Library/Taps/curoky
         cp -r $PWD $(brew --repo)/Library/Taps/curoky/homebrew-custom
 
-    - name: show tap formula
+    - name: show tap info
       shell: bash
       run: brew tap-info curoky/custom --json | jq -r '.[]|(.formula_names[],.cask_tokens[])'
 
     - name: install formula
       shell: bash
-      run: brew install --include-test ${{ inputs.install_args }} curoky/custom/${{ inputs.formula }}
+      run: brew install ${{ inputs.install_args }} curoky/custom/${{ inputs.formula }}
 
     - name: test formula
       shell: bash
-      run: brew test curoky/custom/${{ inputs.formula }} || brew reinstall curoky/custom/${{ inputs.formula }}
-
-    - name: test formula twice
-      shell: bash
-      run: brew test curoky/custom/${{ inputs.formula }}
+      run: brew test ${{ inputs.test_args }} curoky/custom/${{ inputs.formula }}
