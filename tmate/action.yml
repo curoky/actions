@@ -13,16 +13,16 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    # TODO: use precompiled xz-utils
     - name: Donwload xz
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y xz-utils
+        curl -Lo xz https://github.com/curoky/homebrew-tap/releases/download/binary/xz-5.2.5
+        chmod +x ./xz
 
     - name: Donwload tmate
       shell: bash
       run: |
+        export PATH=$PWD:$PATH
         curl -Lo tmate.tar.xz https://github.com/tmate-io/tmate/releases/download/${{ inputs.version }}/tmate-${{ inputs.version }}-static-linux-amd64.tar.xz
         tar -xJvf tmate.tar.xz --strip-components 1
 
