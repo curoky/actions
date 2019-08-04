@@ -56,4 +56,12 @@ runs:
 
     - name: test formula
       shell: bash
-      run: brew test ${{ inputs.test_args }} curoky/custom/${{ inputs.formula }}
+      run: |
+        if [[ "${{ inputs.run_test }}" == "true" ]]; then
+          if ! brew test ${{ inputs.test_args }} curoky/custom/${{ inputs.formula }}; then
+            echo "try reinstall and retest"
+            brew remove curoky/custom/${{ inputs.formula }}
+            brew install ${{ inputs.install_args }} curoky/custom/${{ inputs.formula }}
+            brew test ${{ inputs.test_args }} curoky/custom/${{ inputs.formula }}
+          fi
+        fi
