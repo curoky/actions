@@ -1,0 +1,47 @@
+# Ref: https://stackoverflow.com/questions/59175332/using-output-from-a-previous-job-in-a-new-one-in-a-github-action
+name: dynamic graph
+
+on:
+  push:
+    paths:
+      - .github/workflows/dynamic-graph.yaml
+
+jobs:
+  pre:
+    runs-on: ubuntu-latest
+    outputs:
+      a: ${{ steps.a.outputs.used }}
+      b: ${{ steps.b.outputs.used }}
+      c: ${{ steps.c.outputs.used }}
+    steps:
+      - id: a
+        run: echo "::set-output name=used::123"
+      - id: b
+        run: echo "::set-output name=used::123"
+      - id: c
+        run: echo #"::set-output name=used::123"
+  A:
+    needs: [pre]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{needs.pre.outputs.a}}
+        if: needs.pre.outputs.a
+  B:
+    if: needs.pre.outputs.b
+    needs: [pre]
+    runs-on: ubuntu-latest
+    outputs:
+      emit: ${{ steps.emit.outputs.emit }}
+    steps:
+      - run: echo ${{needs.pre.outputs.b}}
+      - name: emit
+        id: emit
+        run: echo "::set-output name=emit::123"
+  C:
+    # https://github.com/actions/runner/issues/491
+    if: always() && (needs.pre.outputs.c || needs.B.outputs.emit )
+    needs: [pre, B]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo run c
+        if: needs.pre.outputs.c
