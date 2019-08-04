@@ -1,0 +1,13 @@
+name: cleanup artifact
+
+on:
+  push:
+    paths:
+      - .github/workflows/cleanup-disk.yaml
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup Disk
+        uses: curoky/cleanup-disk-action@master
