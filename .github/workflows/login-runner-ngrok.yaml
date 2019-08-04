@@ -1,0 +1,32 @@
+name: login runner with ngrok
+
+on:
+  push:
+    paths:
+      - .github/workflows/login-runner-ngrok.yaml
+
+jobs:
+  connect:
+    strategy:
+      matrix:
+        # ubuntu-20.04 # 16/18/20 or macos-10.15 or windows-2019
+        os: [macos-latest, ubuntu-20.04]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: install ngrok
+        run: |
+          wget -q https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+          unzip ngrok-stable-linux-amd64.zip
+          chmod +x ./ngrok
+
+      - name: run ngrok
+        run: |
+          echo -e "123456\n123456" | sudo passwd "$USER"
+          ./ngrok authtoken "1gBog0sY5zyuE0EJKj76qynOXC8_4NmBLqhyJL9Fo6i5D6jsU"
+          ./ngrok tcp 22 --log ".ngrok.log" &
+          sleep 10
+          echo "To connect: $(grep -o -E "tcp://(.+)" < .ngrok.log | sed "s/tcp:\/\//ssh $USER@/" | sed "s/:/ -p /")"
+
+      - name: don't kill instace
+        run: sleep 1h # Prevent to killing instance after failure
