@@ -1,0 +1,22 @@
+name: context
+
+on:
+  push:
+    paths:
+      - .github/workflows/context.yaml
+
+jobs:
+  show_context:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+  # https://github.community/t/accessing-commit-message-in-pull-request-event/17158/9
+  push-event-commit-list:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo ${{ github.event.before }}
+          echo ${{ github.event.after }}
