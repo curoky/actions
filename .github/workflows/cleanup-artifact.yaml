@@ -1,0 +1,17 @@
+name: cleanup artifact
+
+on:
+  push:
+    paths:
+      - .github/workflows/cleanup-artifact.yaml
+
+jobs:
+  remove-old-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          expire-in: 0
